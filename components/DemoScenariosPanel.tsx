@@ -6,20 +6,15 @@ import {
   Play,
   RotateCcw,
   WifiOff,
-  AlertTriangle,
-  QrCode,
-  Keyboard,
-  Monitor,
-  CheckCircle2,
-  ShieldCheck,
   Zap,
+  CheckCircle2,
 } from "lucide-react";
 
 export interface DemoScenario {
   id: string;
   name: string;
   description: string;
-  heuristic: string;
+  tag: string;
   badge: string;
   badgeColor: string;
   action: () => void;
@@ -51,45 +46,45 @@ export default function DemoScenariosPanel({
   const scenarios: DemoScenario[] = [
     {
       id: "sc1",
-      name: "1. Flujo Feliz: Escaneo QR Rápido",
-      description: "Escanea PC-04 | Lab 302 y preselecciona 'No enciende' listo para envío en 2 clics.",
-      heuristic: "Nielsen #7 (Eficiencia) & Shneiderman (Diálogo con cierre)",
-      badge: "Camino Feliz",
+      name: "1. Reporte Rápido vía QR",
+      description: "Escaneo instantáneo de PC-04 (Lab 302) y selección de 'No enciende' listo para envío.",
+      tag: "Flujo principal en 2 pasos",
+      badge: "Escaneo QR",
       badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
       action: onRunScenario1,
     },
     {
       id: "sc2",
-      name: "2. Falla Periférico (Lab 201 • PC-15)",
-      description: "Reporte de mouse/teclado en Aula 201 con nota complementaria.",
-      heuristic: "Nielsen #6 (Reconocimiento visual con tarjetas 2x2)",
+      name: "2. Reporte de Periféricos",
+      description: "Registro de falla en teclado/mouse en Aula 201 (PC-15) con detalle complementario.",
+      tag: "Diagnóstico de hardware",
       badge: "Periféricos",
       badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/30",
       action: onRunScenario2,
     },
     {
       id: "sc3",
-      name: "3. Código QR Ilegible / Contingencia",
-      description: "Simula daño físico en el sticker QR y despliega el ingreso manual guiado (Lab 301 • PC-12).",
-      heuristic: "Nielsen #5 (Prevención de errores) & #7 (Flexibilidad)",
-      badge: "Contingencia Manual",
+      name: "3. Contingencia / Código Dañado",
+      description: "Simulación de sticker ilegible y apertura del selector manual guiado para Aula 301.",
+      tag: "Alternativa sin escáner",
+      badge: "Ingreso Manual",
       badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
       action: onRunScenario3,
     },
     {
       id: "sc4",
-      name: "4. Excepción de Red 503 & Ticket Offline",
-      description: "Inyecta fallo de red central; demuestra pantalla 5, cero pérdida de datos y ticket provisional.",
-      heuristic: "Nielsen #1 (Estado del sistema) & Shneiderman (Manejo de errores)",
-      badge: "Resiliencia 503",
+      name: "4. Tolerancia a Fallos y Modo Offline",
+      description: "Simula interrupción de conexión central, preserva datos y emite ticket local provisional.",
+      tag: "Alta disponibilidad",
+      badge: "Modo Offline",
       badgeColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
       action: onRunScenario4,
     },
     {
       id: "sc5",
-      name: "5. Falla de Video / Monitor (Lab 202)",
-      description: "Reporte de monitor parpadeante en PC-22 de Lab 202.",
-      heuristic: "Nielsen #6 (Mapeo natural e iconografía clara)",
+      name: "5. Diagnóstico de Pantalla / Video",
+      description: "Reporte de parpadeo e intermitencia de video en Aula 202 (PC-22).",
+      tag: "Falla visual / display",
       badge: "Pantalla / Video",
       badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
       action: onRunScenario5,
@@ -105,8 +100,8 @@ export default function DemoScenariosPanel({
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-white leading-tight">Escenarios Predefinidos</h3>
-            <p className="text-[10px] text-slate-400">Guía interactiva para evaluación IHC</p>
+            <h3 className="text-xs font-bold text-white leading-tight">Flujos de Demostración</h3>
+            <p className="text-[10px] text-slate-400">Pruebas interactivas del sistema</p>
           </div>
         </div>
         <button
@@ -123,7 +118,7 @@ export default function DemoScenariosPanel({
       <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <WifiOff className={`w-4 h-4 ${simularFalloRed ? "text-rose-400" : "text-slate-500"}`} />
-          <span className="text-[11px] font-medium text-slate-300">Simulación Fallo 503 (Sin Red):</span>
+          <span className="text-[11px] font-medium text-slate-300">Simular Corte de Red (Offline):</span>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
           <input
@@ -165,18 +160,18 @@ export default function DemoScenariosPanel({
               <h4 className="text-xs font-bold text-slate-100">{sc.name}</h4>
               <p className="text-[11px] text-slate-400 leading-snug">{sc.description}</p>
               <div className="text-[9px] text-sky-400/90 font-medium flex items-center gap-1 mt-0.5">
-                <ShieldCheck className="w-3 h-3 text-sky-400 shrink-0" />
-                <span>{sc.heuristic}</span>
+                <CheckCircle2 className="w-3 h-3 text-sky-400 shrink-0" />
+                <span>{sc.tag}</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Heuristic Footer Note */}
+      {/* Footer Note */}
       <div className="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[10px] text-slate-400 flex items-center gap-2">
         <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-        <span>Haz clic en &quot;Cargar&quot; para que la app configure automáticamente variables y pantallas.</span>
+        <span>Haz clic en &quot;Cargar&quot; para ejecutar cualquier flujo de demostración de manera automática.</span>
       </div>
     </div>
   );

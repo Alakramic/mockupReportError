@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, CheckCircle2, X } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 import StatusBar from "@/components/StatusBar";
 import AppHeader from "@/components/AppHeader";
 import ProgressBar from "@/components/ProgressBar";
@@ -159,7 +159,7 @@ export default function AlertaAveriasApp() {
     setTicketData(null);
     setSimularFalloRed(false);
     setActiveScenarioId(null);
-    showToast("Sistema reiniciado a valores por defecto");
+    showToast("Aplicación reiniciada");
   };
 
   // Tab switching
@@ -185,7 +185,7 @@ export default function AlertaAveriasApp() {
     setSelectedFalla("No enciende");
     setDetallesExtra("No emite sonido ni luces LED al presionar botón de encendido.");
     setCurrentScreen("screen2");
-    showToast("Escenario 1: PC-04 | Lab 302 (No enciende) listo para enviar");
+    showToast("Flujo 1: PC-04 | Lab 302 (No enciende) listo para enviar");
   };
 
   // Predefined Scenario 2: Periférico Roto (Lab 201)
@@ -195,9 +195,9 @@ export default function AlertaAveriasApp() {
     setActiveTab("reportar");
     setScannedPc({ id: "PC-15-LAB201", aula: "201", numero: 15, estado: "OPERATIVO" });
     setSelectedFalla("Periférico roto");
-    setDetallesExtra("Mouse óptico no responde al clic izquierdo y conector USB flojo.");
+    setDetallesExtra("Mouse óptico no responde al clic izquierdo y cable USB flojo.");
     setCurrentScreen("screen2");
-    showToast("Escenario 2: PC-15 | Lab 201 (Periférico roto) cargado");
+    showToast("Flujo 2: PC-15 | Lab 201 (Periférico roto) cargado");
   };
 
   // Predefined Scenario 3: QR Dañado / Contingencia Manual (Lab 301 • PC-12)
@@ -211,10 +211,10 @@ export default function AlertaAveriasApp() {
     setManualModalConfig({
       aula: "301",
       pcNum: "12",
-      infoBanner: "Sticker QR dañado por raspadura. Seleccionando manualmente Lab 301 - PC 12.",
+      infoBanner: "Código QR desgastado. Ingreso manual seleccionado para Aula 301 - PC 12.",
     });
     setShowManualModal(true);
-    showToast("Escenario 3: Desplegando contingencia manual para Aula 301");
+    showToast("Flujo 3: Contingencia manual activada para Aula 301");
   };
 
   // Predefined Scenario 4: Falla de Servidor 503 & Modo Offline (Lab 303 • PC-08)
@@ -224,9 +224,9 @@ export default function AlertaAveriasApp() {
     setActiveTab("reportar");
     setScannedPc({ id: "PC-08-LAB303", aula: "303", numero: 8, estado: "OPERATIVO" });
     setSelectedFalla("Sin red / Internet");
-    setDetallesExtra("Sin conexión al switch central. Cable de red sin link.");
+    setDetallesExtra("Sin conexión al switch central. Cable de red sin enlace.");
     setCurrentScreen("screen2");
-    showToast("Escenario 4: Simulación 503 activada. Haz clic en 'Enviar Alerta'.");
+    showToast("Flujo 4: Simulación de fallo de red activa. Pulsa 'Enviar Alerta'.");
   };
 
   // Predefined Scenario 5: Falla de Video / Monitor (Lab 202 • PC-22)
@@ -236,24 +236,13 @@ export default function AlertaAveriasApp() {
     setActiveTab("reportar");
     setScannedPc({ id: "PC-22-LAB202", aula: "202", numero: 22, estado: "OPERATIVO" });
     setSelectedFalla("Pantalla / Video");
-    setDetallesExtra("Pantalla parpadea con líneas horizontales verdes.");
+    setDetallesExtra("Pantalla parpadea con líneas horizontales intermitentes.");
     setCurrentScreen("screen2");
-    showToast("Escenario 5: PC-22 | Lab 202 (Pantalla / Video) cargado");
+    showToast("Flujo 5: PC-22 | Lab 202 (Pantalla / Video) cargado");
   };
 
   return (
     <main className="w-full min-h-screen flex flex-col items-center justify-center p-2 sm:p-6 bg-slate-950 font-sans text-slate-800">
-      {/* Top Banner Context Info */}
-      <div className="w-full max-w-[840px] mb-3 flex items-center justify-between text-xs text-slate-300 px-2">
-        <div className="flex items-center gap-1.5 font-semibold text-sky-400">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>IHC Lab 03 - Caso D (UNSA EPIS) • Entorno de Evaluación</span>
-        </div>
-        <div className="text-[11px] text-slate-400 hidden sm:block">
-          5 Heurísticas Implementadas (Nielsen 1, 5, 6, 7 & Shneiderman)
-        </div>
-      </div>
-
       {/* 2-COLUMN LAYOUT: SMARTPHONE VIEWPORT + DEMO SCENARIOS ASSISTANT */}
       <div className="w-full max-w-[840px] flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6">
         {/* PHONE VIEWPORT CONTAINER (max-w-[393px], h-[830px], rounded-[44px], #F4F6F8) */}
@@ -381,7 +370,7 @@ export default function AlertaAveriasApp() {
           <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
 
-        {/* SIDEBAR: PREDEFINED DEMO SCENARIOS & IHC EVALUATION PANEL */}
+        {/* SIDEBAR: PREDEFINED DEMO SCENARIOS PANEL */}
         <DemoScenariosPanel
           onRunScenario1={handleRunScenario1}
           onRunScenario2={handleRunScenario2}
@@ -392,7 +381,7 @@ export default function AlertaAveriasApp() {
           simularFalloRed={simularFalloRed}
           onToggleFalloRed={(val) => {
             setSimularFalloRed(val);
-            showToast(val ? "Simulación de corte 503 activada" : "Red restaurada a la normalidad");
+            showToast(val ? "Simulación de corte activada (Modo Offline)" : "Conexión restaurada");
           }}
           activeScenarioId={activeScenarioId}
         />

@@ -67,10 +67,14 @@ export default function AlertaAveriasApp() {
     showToast(`Equipo confirmado: ${pcId}`);
   };
 
-  // Submit Alert Report Handler
-  const handleSubmitReport = async () => {
-    if (!scannedPc || !selectedFalla) return;
+  // Submit Alert Report Handler with explicit override support
+  const handleSubmitReport = async (overrideFalloRed?: boolean) => {
+    if (!scannedPc || !selectedFalla) {
+      showToast("Selecciona una avería antes de enviar.");
+      return;
+    }
 
+    const failureMode = overrideFalloRed !== undefined ? overrideFalloRed : simularFalloRed;
     setIsSubmitting(true);
 
     try {
@@ -81,19 +85,22 @@ export default function AlertaAveriasApp() {
           pcId: scannedPc.id,
           aula: scannedPc.aula,
           falla: selectedFalla,
-          simularFalloRed: simularFalloRed,
+          simularFalloRed: failureMode,
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok && data.success) {
         setTicketData(data.ticket);
         setCurrentScreen("screen4");
         showToast("¡Alerta registrada con éxito!");
-      } else {
-        // Exception: 503 or server error -> Show Screen 5
+      } else if (response.status === 503 || failureMode) {
+        // HTTP 503 Network Exception -> Screen 5 (Error de conexión y recuperación)
         setCurrentScreen("screen5");
+      } else {
+        // Validation or other error (e.g. 400)
+        showToast(data.error || "No se pudo procesar el reporte.");
       }
     } catch (error) {
       console.error("Network exception:", error);
@@ -103,10 +110,11 @@ export default function AlertaAveriasApp() {
     }
   };
 
-  // Screen 5 Recovery: Retry
+  // Screen 5 Recovery: Retry (Forces normal network success)
   const handleRetrySubmit = () => {
     setSimularFalloRed(false);
-    handleSubmitReport();
+    showToast("Reintentando con conexión restablecida...");
+    handleSubmitReport(false); // Explicitly override failure mode to false
   };
 
   // Screen 5 Recovery: Save Offline Emergency Ticket
@@ -140,7 +148,7 @@ export default function AlertaAveriasApp() {
 
     setTicketData(offlineTicket);
     setCurrentScreen("screen4");
-    showToast("Ticket guardado en modo local fuera de línea");
+    showToast("Ticket provisional guardado localmente (Offline)");
   };
 
   // Copy Ticket ID
@@ -176,7 +184,7 @@ export default function AlertaAveriasApp() {
     }
   };
 
-  // Predefined Scenario 1: Camino Feliz
+  // Predefined Scenario 1: Camino Feliz (Red Normal)
   const handleRunScenario1 = () => {
     setActiveScenarioId("sc1");
     setSimularFalloRed(false);
@@ -188,7 +196,7 @@ export default function AlertaAveriasApp() {
     showToast("Flujo 1: PC-04 | Lab 302 (No enciende) listo para enviar");
   };
 
-  // Predefined Scenario 2: Periférico Roto (Lab 201)
+  // Predefined Scenario 2: Periférico Roto (Red Normal)
   const handleRunScenario2 = () => {
     setActiveScenarioId("sc2");
     setSimularFalloRed(false);
@@ -200,7 +208,7 @@ export default function AlertaAveriasApp() {
     showToast("Flujo 2: PC-15 | Lab 201 (Periférico roto) cargado");
   };
 
-  // Predefined Scenario 3: QR Dañado / Contingencia Manual (Lab 301 • PC-12)
+  // Predefined Scenario 3: QR Dañado / Contingencia Manual (Red Normal)
   const handleRunScenario3 = () => {
     setActiveScenarioId("sc3");
     setSimularFalloRed(false);
@@ -217,7 +225,7 @@ export default function AlertaAveriasApp() {
     showToast("Flujo 3: Contingencia manual activada para Aula 301");
   };
 
-  // Predefined Scenario 4: Falla de Servidor 503 & Modo Offline (Lab 303 • PC-08)
+  // Predefined Scenario 4: Falla de Servidor 503 & Modo Offline (Fallo Red ON)
   const handleRunScenario4 = () => {
     setActiveScenarioId("sc4");
     setSimularFalloRed(true);
@@ -226,10 +234,10 @@ export default function AlertaAveriasApp() {
     setSelectedFalla("Sin red / Internet");
     setDetallesExtra("Sin conexión al switch central. Cable de red sin enlace.");
     setCurrentScreen("screen2");
-    showToast("Flujo 4: Simulación de fallo de red activa. Pulsa 'Enviar Alerta'.");
+    showToast("Flujo 4: Fallo de red activado. Pulsa 'Enviar Alerta' para ver la pantalla de recuperación.");
   };
 
-  // Predefined Scenario 5: Falla de Video / Monitor (Lab 202 • PC-22)
+  // Predefined Scenario 5: Falla de Video / Monitor (Red Normal)
   const handleRunScenario5 = () => {
     setActiveScenarioId("sc5");
     setSimularFalloRed(false);
@@ -319,7 +327,7 @@ export default function AlertaAveriasApp() {
                     }}
                     onChangeDetalles={setDetallesExtra}
                     onChangePc={() => setCurrentScreen("screen1")}
-                    onSubmit={handleSubmitReport}
+                    onSubmit={() => handleSubmitReport()}
                   />
                 )}
 
@@ -381,7 +389,7 @@ export default function AlertaAveriasApp() {
           simularFalloRed={simularFalloRed}
           onToggleFalloRed={(val) => {
             setSimularFalloRed(val);
-            showToast(val ? "Simulación de corte activada (Modo Offline)" : "Conexión restaurada");
+            showToast(val ? "Simulación de corte activada (Modo Offline)" : "Conexión normal restaurada");
           }}
           activeScenarioId={activeScenarioId}
         />
